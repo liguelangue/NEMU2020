@@ -16,28 +16,29 @@ enum {
 static struct rule {
 	char *regex;
 	int token_type;
+        int priority;
 } rules[] = {
 
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
 
-	{" +",	NOTYPE},				// spaces
-	{"\\+", '+'},					// plus
-	{"==", EQ},                                     //equal
-        {"\\b[0-9]+\\b",NUMBER}, 			//number
-        {"\\b0[xX][0-9a-fA-F]+\\b",HNUMBER},            //16number
-        {"\\$[a-zA-Z]+",REGISTER},                        //register
-        {"\\b[a-zA-Z_0-9]+",MARK},                       //mark
-        {"!=",NEQ},                                      //not equal
-        {"!",'!'},                                        //note
-        {"\\*",'*'},                                     //multyply
-        {"/",'/'},                                       //division
-        {"-",'-'},                                       //substract
-        {"&&",AND},                                      //and
-        {"\\|\\|",OR},                                   //or
-        {"\\(",'('},                                     //left bracket
-        {"\\)",')'}                                     //right bracket			
+	{" +",	NOTYPE,0},				// spaces
+	{"\\+", '+',4},					// plus
+	{"==", EQ,3},                                     //equal
+        {"\\b[0-9]+\\b",NUMBER,0}, 			//number
+        {"\\b0[xX][0-9a-fA-F]+\\b",HNUMBER,0},            //16number
+        {"\\$[a-zA-Z]+",REGISTER,0},                        //register
+        {"\\b[a-zA-Z_0-9]+",MARK,0},                       //mark
+        {"!=",NEQ,3},                                      //not equal
+        {"!",'!',6},                                        //note
+        {"\\*",'*',5},                                     //multyply
+        {"/",'/',5},                                       //division
+        {"-",'-',4},                                       //substract
+        {"&&",AND,2},                                      //and
+        {"\\|\\|",OR,1},                                   //or
+        {"\\(",'(',7},                                     //left bracket
+        {"\\)",')',7}                                     //right bracket			
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -64,6 +65,7 @@ void init_regex() {
 typedef struct token {
 	int type;
 	char str[32];
+        int priority;
 } Token;
 
 Token tokens[32];
@@ -81,6 +83,7 @@ static bool make_token(char *e) {
 		for(i = 0; i < NR_REGEX; i ++) {
 			if(regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
 				char *substr_start = e + position;
+                                char *tmp = e + position + 1;
 				int substr_len = pmatch.rm_eo;
 
 				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
@@ -92,7 +95,20 @@ static bool make_token(char *e) {
 				 */
 
 				switch(rules[i].token_type) {
-					default: panic("please implement me");
+                                        case NOTYPE: break;
+                                        case REGISTER:
+                                               tokens[nr_token].type = rules[i].token_type;
+                                               tokens[nr_token].priority = rules[i].priority;
+                                               strncpy(tokens[nr_token].str,tmp,substr_len-1);
+                                               tokens[nr_token].str[substr_len-1]='\0';
+                                               nr_token++;
+                                               break;
+					default: 
+                                               tokens[nr_token].type = rules[i].token_type;
+                                               tokens[nr_token].priority = rules[i].priority;
+                                               strncpy(tokens[nr_token].str,substr_start,substr_len);
+                                               tokens[nr_token].str[substr_len]='\0';
+                                               nr_token++;
 				}
 
 				break;
