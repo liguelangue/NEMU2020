@@ -38,15 +38,46 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_si(char *args){
+       int step;
+       if(args == NULL) step=1;
+       else sscanf(args , "%d" , &step);
+       cpu_exec(step);
+       return 0;
+}
+
+static int cmd_info(char *args){
+      if(args[0] == 'r'){
+         int i;
+         for(i=R_EAX ; i<=R_EDI ; i++)
+            printf("$%s\t0x%8x\n" , regsl[i] , reg_l(i));
+         printf("$eip\t0x%8x\n" , cpu.eip);
+      }
+return 0;
+}
+
+static int cmd_x(char *args){
+       if(args == NULL){ printf("Wrong command!\n");  return 0; }
+       int num,exprs;
+       sscanf(args , "%d%x" , &num , &exprs);
+       int i;
+       for(i=0 ; i<num ; i++){
+           printf("0x%8x\t0x%x\n" , exprs+i*4 , swaddr_read(exprs+i*4,4));
+       }
+       return 0;
+}
+
 static struct {
 	char *name;
 	char *description;
 	int (*handler) (char *);
 } cmd_table [] = {
 	{ "help", "Display informations about all supported commands", cmd_help },
-	{ "c", "Continue the execution of the program", cmd_c },
+	{ "c", "::Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
-
+        { "si", "step by step", cmd_si },
+        { "info","print registers", cmd_info },
+        { "x" , "read memory" , cmd_x }
 	/* TODO: Add more commands */
 
 };
@@ -109,3 +140,4 @@ void ui_mainloop() {
 		if(i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
 	}
 }
+
