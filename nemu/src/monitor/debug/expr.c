@@ -5,6 +5,7 @@
  */
 #include <sys/types.h>
 #include <regex.h>
+#include <elf.h>
 
 enum {
 	NOTYPE = 256, EQ, NUMBER, HNUMBER, REGISTER, MARK, NEQ, AND,OR ,POINTOR, MINUS
@@ -218,7 +219,7 @@ uint32_t eval(int l,int r)
                }
                
            }
-           if(tokens[l].type==MARK)
+          /* if(tokens[l].type==MARK)
            {
                int i;
                for(i=0;i<nr_symtab_entry;i++)
@@ -234,7 +235,7 @@ uint32_t eval(int l,int r)
                     }
                }
 
-           }
+           }*/
            return num;
         }
         else if(check_parentheses(l,r)==true) 
@@ -243,7 +244,7 @@ uint32_t eval(int l,int r)
         {
                int op = dominant_operator(l,r);
                printf("op = %d\n",op);
-               if(l==op || tokens[op].type==POINTOR || tokens[op].type==MINUS || tokens[op].type=='!')
+              /* if(l==op || tokens[op].type==POINTOR || tokens[op].type==MINUS || tokens[op].type=='!')
                 {
                       uint32_t val = eval(l+1,r);
                       printf("val = %d\n",val);
@@ -259,8 +260,8 @@ uint32_t eval(int l,int r)
                            default :
                                Assert(1,"default\n");
                      }
-                }
-                uint32_t val1=eval(1,op-1);
+                }*/
+                uint32_t val1=eval(l,op-1);
                 uint32_t val2=eval(op+1,r);
                 printf("1=%d,2=%d\n",val1,val2);
                 switch(tokens[op].type)
@@ -273,12 +274,11 @@ uint32_t eval(int l,int r)
                        case NEQ: return val1!=val2;
                        case AND: return val1&&val2;
                        case OR:  return val1||val2;
-                       default:
+                       default:  assert(0);
                        break;    
                 }
         }
-       assert(1);
-       return -123456;
+       return 0;
 }
 
 uint32_t expr(char *e, bool *success) {
