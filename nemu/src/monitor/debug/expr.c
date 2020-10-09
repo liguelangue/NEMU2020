@@ -247,7 +247,6 @@ uint32_t eval(int l,int r)
                if(l==op || tokens[op].type==POINTOR || tokens[op].type==MINUS || tokens[op].type=='!')
                 {
                       uint32_t val = eval(l+1,r);
-                      printf("val = %d\n",val);
                       switch(tokens[l].type)
                       {
                            case POINTOR: 
@@ -263,7 +262,6 @@ uint32_t eval(int l,int r)
                 }
                 uint32_t val1=eval(l,op-1);
                 uint32_t val2=eval(op+1,r);
-                printf("1=%d,2=%d\n",val1,val2);
                 switch(tokens[op].type)
                 {
                        case '+': return val1+val2;
