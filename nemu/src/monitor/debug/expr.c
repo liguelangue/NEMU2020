@@ -26,11 +26,8 @@ static struct rule {
 
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
-	 */
+	*/
 
-	{" +",	NOTYPE,0},				// spaces
-	{"\\+", '+',4},					// plus
-	{"==", EQ,3},                                     //equal
         {"\\b[0-9]+\\b",NUMBER,0}, 			//number
         {"\\b0[xX][0-9a-fA-F]+\\b",HNUMBER,0},            //16number
         {"\\$[a-zA-Z]+",REGISTER,0},                        //register
@@ -39,7 +36,10 @@ static struct rule {
         {"!",'!',6},                                        //note
         {"\\*",'*',5},                                     //multyply
         {"/",'/',5},                                       //division
+        {" +",NOTYPE,0},                                  //spaces
+        {"\\+",'+',4},                                    //plus
         {"-",'-',4},                                       //substract
+        {"==",EQ,3},                                       //equal
         {"&&",AND,2},                                      //and
         {"\\|\\|",OR,1},                                   //or
         {"\\(",'(',7},                                     //left bracket
