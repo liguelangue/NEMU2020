@@ -103,4 +103,20 @@ bool check_wp()
   return key;
 }
 
+void delete_wp(int num)
+{
+   WP *f;
+   f = &wp_pool[num];
+   free_wp(f);
+}
 
+void info_wp()
+{
+    WP *f;
+    f=head;
+    while(f!=NULL)
+    {
+        printf("Watchpoint %d: %s = %d\n",f->NO,f->expr,f->val);
+        f = f->next;   
+    }
+}
