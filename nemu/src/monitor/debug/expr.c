@@ -261,6 +261,8 @@ uint32_t eval(int l,int r)
                 }
                 uint32_t val1=eval(l,op-1);
                 uint32_t val2=eval(op+1,r);
+                printf("%d",val1);
+                printf("%d\n",val2);
                 switch(tokens[op].type)
                 {
                        case '+': return val1+val2;
