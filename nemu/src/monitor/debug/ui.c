@@ -50,9 +50,11 @@ static int cmd_info(char *args){
       if(args[0] == 'r'){
          int i;
          for(i=R_EAX ; i<=R_EDI ; i++)
-            printf("$%s\t0x%8x\n" , regsl[i] , reg_l(i));
-         printf("$eip\t0x%8x\n" , cpu.eip);
+            printf("%s\t0x%08x\n" , regsl[i] , reg_l(i));
+         printf("eip\t0x%08x\n" , cpu.eip);
       }
+      else if(args[0]=='w')
+           info_wp();
 return 0;
 }
 
@@ -77,6 +79,27 @@ static int cmd_p(char *args){
            return 0;
 }
 
+static int cmd_w(char *args)
+{
+   WP *f;
+   bool suc;
+   f=new_wp();
+   printf("Watchpoint %d:%s\n",f->NO,args);
+   f->val=expr(args,&suc);
+   strcpy(f->expr,args);
+   if(!suc) Assert(1,"wrong\n");
+   printf("Value :%d\n",f->val);
+   return 0;
+}
+
+static int cmd_d(char *args)
+{
+   int num;
+   sscanf(args,"%d",&num);
+   delete_wp(num);
+   return 0;
+}
+
 static struct {
 	char *name;
 	char *description;
@@ -88,7 +111,9 @@ static struct {
         { "si", "step by step", cmd_si },
         { "info","print registers", cmd_info },
         { "x" , "read memory" , cmd_x },
-        { "p", "Expression evaluation", cmd_p}
+        { "p", "Expression evaluation", cmd_p},
+        { "w","New a watchpoint", cmd_w},
+        {"d","Delete the watchpoint",cmd_d}
 	/* TODO: Add more commands */
 
 };
