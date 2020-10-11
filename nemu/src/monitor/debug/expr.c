@@ -8,7 +8,7 @@
 #include <elf.h>
 
 enum {
-	NOTYPE = 256, EQ, NUMBER, HNUMBER, REGISTER, MARK, NEQ, AND,OR ,POINTOR, MINUS
+	NOTYPE = 256, EQ, NUMBER, HNUMBER, REGISTER, MARK, NEQ, AND,OR ,POINTER, MINUS
 
 	/* TODO: Add more token types */
 
@@ -243,12 +243,12 @@ uint32_t eval(int l,int r)
         else
         {
                int op = dominant_operator(l,r);
-               if(l==op || tokens[op].type==POINTOR || tokens[op].type==MINUS || tokens[op].type=='!')
+               if(l==op || tokens[op].type==POINTER || tokens[op].type==MINUS || tokens[op].type=='!')
                 {
                       uint32_t val = eval(l+1,r);
                       switch(tokens[l].type)
                       {
-                           case POINTOR: 
+                           case POINTER: 
                             //   current_sreg=R_DS;
                                return swaddr_read(val,4);
                            case MINUS:
@@ -290,7 +290,7 @@ uint32_t expr(char *e, bool *success) {
          {
              if(tokens[i].type=='*' && ( i==0 || (tokens[i-1].type != NUMBER && tokens[i-1].type != HNUMBER && tokens[i-1].type != REGISTER && tokens[i-1].type != MARK && tokens[i-1].type != ')')))
              {
-                tokens[i].type=POINTOR;
+                tokens[i].type=POINTER;
                 tokens[i].priority=6;
              }
              if(tokens[i].type=='-' && (i==0 || (tokens[i-1].type != NUMBER && tokens[i-1].type != HNUMBER && tokens[i-1].type != REGISTER && tokens[i-1].type != MARK && tokens[i-1].type != ')')))
